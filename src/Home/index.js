@@ -20,7 +20,7 @@ export default function Home({route}){
 
   return (
       <View style={styles.container}>
-        <Text style={styles.texto}>Olá, {route.params?.email} </Text>
+        <Text style={styles.texto}>Olá, {route.params?.banco} </Text>
         <Text style={styles.texto}>Está na pagina Home</Text>
         <TouchableOpacity 
         onPress={deslogar}

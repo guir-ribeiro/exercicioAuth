@@ -11,6 +11,7 @@ import firebase from '../firebaseConnection';
 
 export default function Login(){
 
+    const [nome, setNome] = useState();
     const [email, setEmail] = useState();
     const [senha, setSenha] = useState();
     const [isUser, setIsUser] = useState(true);
@@ -20,7 +21,9 @@ export default function Login(){
     async function logar(){
         await firebase.auth().signInWithEmailAndPassword(email,senha)
         .then((value)=>{
-            navigation.navigate('Home', {email: value.user.email})
+            firebase.database().ref(`usuarios/${value.user.uid}`).once('value', (snapshot) => {
+                navigation.navigate('Home', {banco: snapshot.val().nome})
+            })
         }).catch((error)=>{
             alert('Algo de errado não está certo')
             return
@@ -33,7 +36,11 @@ export default function Login(){
     async function criarConta() {
         await firebase.auth().createUserWithEmailAndPassword(email, senha)
         .then(value =>{
-            console.log(value.user.email)
+            firebase.database().ref('usuarios').child(value.user.uid).set({
+                nome: nome
+            })
+            console.log(value.user.uid)
+            setNome('');
             setEmail('');
             setSenha('');
         }).catch(error => {
@@ -45,6 +52,19 @@ export default function Login(){
 
   return (
       <View style={styles.container}>
+
+        {!isUser &&
+        <View>
+            <Text style={styles.texto}>Nome</Text>
+            <TextInput
+                value={nome}
+                placeholder='Nome'
+                style={styles.input}
+                onChangeText={(texto)=> setNome(texto)}
+            />
+        </View>
+        }
+
         <Text style={styles.texto}>Email</Text>
         <TextInput
             value={email}
